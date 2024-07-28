@@ -9,20 +9,19 @@ spec:
   - name: node
     image: node:22-alpine
     imagePullPolicy: Always
-	command: 
-	- sleep
-	args:
-	- 1h
-  containers:
+    command: 
+    - sleep
+    args:
+    - 1h
   - name: docker
     image: docker:cli
     imagePullPolicy: Always
-	command: 
-	- sleep
-	args:
-	- 1h
-	securityContext:
-	  privileged: true
+    command: 
+    - sleep
+    args:
+    - 1h
+    securityContext:
+      privileged: true
 '''
 		}
 	}
