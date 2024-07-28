@@ -60,7 +60,7 @@ spec:
 		stage('Node Build') {
 			steps {
 				script {
-					sh "npm version ${params.APP_VERSION} --no-git-tag-version"
+					sh "npm version ${env.APP_VERSION} --no-git-tag-version"
 					sh 'npm install'
 					sh 'npm run build'
 					sh 'npm run build:jar'
