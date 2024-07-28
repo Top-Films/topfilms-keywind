@@ -39,22 +39,20 @@ containers:
 	stages {
 
 		stage('Git Clone') {
-			checkout scmGit(
-					branches: [
-						[
-							name: "${params.BRANCH}"
-						]
-					],
-					userRemoteConfigs: [
-						[
-							credentialsId: '827446b2-c8ac-4420-bcda-87696bb62634',
-							url: "${env.GITHUB_URL}"
-						]
-					]
+			steps {
+				checkout scmGit(
+					branches: [[
+						name: "${params.BRANCH}"
+					]],
+					userRemoteConfigs: [[
+						credentialsId: '827446b2-c8ac-4420-bcda-87696bb62634',
+						url: "${env.GITHUB_URL}"
+					]]
 				)
 
 				sh 'ls -lah'
 				sh 'node -v'
+			}
 		}
 
 		stage('Node Build') {
@@ -66,12 +64,12 @@ containers:
 
 		stage('Docker Push Artifact') {
 			container('dind') {
-				withCredentials([
-					usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')
-				]) {
-  					sh "docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
-					sh "echo '$DOCKER_PASSWORD' | docker login -u '$DOCKER_USERNAME' --password-stdin"
-            		sh "docker push $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
+				steps {
+					withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+						sh "docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
+						sh "echo '$DOCKER_PASSWORD' | docker login -u '$DOCKER_USERNAME' --password-stdin"
+						sh "docker push $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
+					}
 				}
 			}
 		}
