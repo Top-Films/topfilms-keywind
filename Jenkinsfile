@@ -20,20 +20,20 @@ spec:
     - sleep
     args:
     - 99d
-
 '''
 		}
 	}
 
 	parameters {
 		string(name: 'BRANCH', defaultValue: params.BRANCH ?: 'main', description: 'Branch to checkout')
-		string(name: 'APP_VERSION', defaultValue: params.APP_VERSION ?: '1.0.0', description: 'Version of the application')
+		string(name: 'VERSION', defaultValue: params.APP_VERSION ?: '1.0', description: 'Major and minor version of the application')
 	}
 
 	environment { 
 		ORG_NAME = 'topfilms'
 		APP_NAME = 'topfilms-keywind'
 		GITHUB_URL = 'https://github.com/Top-Films/topfilms-keywind'
+		APP_VERSION = "${params.VERSION}.${env.BUILD_NUMBER}"
 	}
 
 	stages {
