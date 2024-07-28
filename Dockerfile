@@ -1,3 +1,3 @@
 FROM busybox
 
-COPY ./out/theme/keywind/ /topfilms-keywind/
+COPY out/theme/keywind /topfilms-keywind/

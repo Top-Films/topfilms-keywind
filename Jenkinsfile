@@ -62,6 +62,7 @@ spec:
 					sh 'npm install'
 					sh 'npm run build'
 					sh 'npm run build:jar'
+					sh 'cd out && unzip keywind.jar'
 
 					sh 'ls -lah'
 					sh 'ls ./out -lah'
