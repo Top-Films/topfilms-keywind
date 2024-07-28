@@ -9,12 +9,20 @@ spec:
   - name: node
     image: node:22-alpine
     imagePullPolicy: Always
+	command: 
+	- sleep
+	args:
+	- 1h
   containers:
   - name: docker
     image: docker:cli
     imagePullPolicy: Always
-    args:
-    - --privileged
+	command: 
+	- sleep
+	args:
+	- 1h
+	securityContext:
+	  privileged: true
 '''
 		}
 	}
@@ -27,8 +35,8 @@ spec:
 	environment { 
 		ORG_NAME = 'topfilms'
 		APP_NAME = 'topfilms-keywind'
-		GITHUB_URL = 'https://github.com/Top-Films/topfilms-keywind'
 		APP_VERSION = "${params.VERSION}.${env.BUILD_NUMBER}"
+		GITHUB_URL = 'https://github.com/Top-Films/topfilms-keywind'
 	}
 
 	stages {
