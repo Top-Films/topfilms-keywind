@@ -28,7 +28,6 @@ spec:
 	}
 
 	environment { 
-		ORG_NAME = 'topfilms'
 		APP_NAME = 'topfilms-keywind'
 		APP_VERSION = "${params.VERSION}.${env.BUILD_NUMBER}"
 		GITHUB_URL = 'https://github.com/Top-Films/topfilms-keywind'
@@ -66,7 +65,6 @@ spec:
 
 					sh 'ls -lah'
 					sh 'ls ./out -lah'
-					sh 'ls ./theme -lah'
 				}
 			}
 		}
@@ -76,10 +74,9 @@ spec:
 				container('docker') {
 					script {
 						withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-							sh 'ls -lah'
 							sh "echo '$DOCKER_PASSWORD' | docker login -u '$DOCKER_USERNAME' --password-stdin"
-							sh "docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
-							sh "docker push $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
+							sh "docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$APP_NAME:$APP_VERSION"
+							sh "docker push $DOCKER_USERNAME/$APP_NAME:$APP_VERSION"
 						}
 					}
 				}
