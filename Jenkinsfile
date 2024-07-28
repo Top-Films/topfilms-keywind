@@ -13,11 +13,6 @@ spec:
     - sleep
     args:
     - 99d
-  - name: dind
-    image: docker:27-dind
-    imagePullPolicy: Always
-    args:
-    - --privileged
 '''
 		}
 	}
@@ -72,13 +67,16 @@ spec:
 
 		stage('Docker Push Artifact') {
 			steps {
-				container('dind') {
-					script {
-						withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+				script {
+					withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+						docker.withRegistry('my.registry.com', '9bbf8bb7-1489-4260-a7a0-afce14eea51b') {
 							sh 'docker -v'
-							sh "docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
-							sh "echo '$DOCKER_PASSWORD' | docker login -u '$DOCKER_USERNAME' --password-stdin"
-							sh "docker push $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
+							// sh "docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
+							// sh "echo '$DOCKER_PASSWORD' | docker login -u '$DOCKER_USERNAME' --password-stdin"
+							// sh "docker push $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
+							// def image = docker.image("$DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION")
+							sh "docker buildx create --use --name multiarch"
+							sh "docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION --push"
 						}
 					}
 				}
