@@ -13,6 +13,12 @@ spec:
     - sleep
     args:
     - 99d
+  containers:
+  - name: dind
+    image: docker:27-dind
+    imagePullPolicy: Always
+    args:
+    - --privileged
 '''
 		}
 	}
@@ -67,7 +73,7 @@ spec:
 
 		stage('Docker Push Artifact') {
 			steps {
-				container('jnlp') {
+				container('dind') {
 					script {
 						withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 							docker.withRegistry('https://docker.io', '9bbf8bb7-1489-4260-a7a0-afce14eea51b') {
