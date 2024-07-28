@@ -64,10 +64,10 @@ spec:
 					sh 'npm install'
 					sh 'npm run build'
 					sh 'npm run build:jar'
-					
+
 					sh 'ls -lah'
-					sh 'ls /out -lah'
-					sh 'ls /theme -lah'
+					sh 'ls ./out -lah'
+					sh 'ls ./theme -lah'
 				}
 			}
 		}
