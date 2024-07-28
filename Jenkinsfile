@@ -73,10 +73,11 @@ spec:
 		}
 
 		stage('Docker Push Artifact') {
-			steps {
-				container('dind') {
+			container('dind') {
+				steps {
 					script {
 						withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+							sh 'docker -v'
 							sh 'systemctl start docker'
 							sh "docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
 							sh "echo '$DOCKER_PASSWORD' | docker login -u '$DOCKER_USERNAME' --password-stdin"
