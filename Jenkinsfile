@@ -16,10 +16,6 @@ spec:
   - name: docker
     image: docker:27-dind
     imagePullPolicy: Always
-    command: 
-    - sleep
-    args:
-    - 1h
     securityContext:
       privileged: true
 '''
@@ -78,7 +74,6 @@ spec:
 			steps {
 				container('docker') {
 					script {
-						sh 'env | grep DOCKER_HOST'
 						withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 							docker.withRegistry('https://docker.io', '9bbf8bb7-1489-4260-a7a0-afce14eea51b') {
 								docker.build("$DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION").push()
