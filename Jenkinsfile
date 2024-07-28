@@ -16,10 +16,8 @@ spec:
   - name: dind
     image: docker:27-dind
     imagePullPolicy: Always
-    command:
-    - sleep
     args:
-    - 99d
+    - --privileged
 '''
 		}
 	}
