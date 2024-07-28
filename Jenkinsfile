@@ -74,11 +74,10 @@ spec:
 			steps {
 				container('docker') {
 					script {
-						withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-							docker.withRegistry('https://docker.io', '9bbf8bb7-1489-4260-a7a0-afce14eea51b') {
-								docker.build("$DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION").push()
-							}
-						}
+						sh 'ls -lah'
+						sh "echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin"
+						sh "docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
+						sh "docker push $DOCKER_USERNAME/$ORG_NAME-$APP_NAME:$APP_VERSION"
 					}
 				}
 			}
