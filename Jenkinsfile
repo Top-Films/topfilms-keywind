@@ -14,7 +14,7 @@ spec:
     args:
     - 99d
   - name: dind
-    image: docker:27.1.1-dind-alpine3.20
+    image: docker:27-dind
     imagePullPolicy: Always
     command:
     - sleep
