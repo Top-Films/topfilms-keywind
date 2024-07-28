@@ -18,7 +18,7 @@ spec:
     image: docker:cli
     imagePullPolicy: Always
     args:
-    - --privileged && sleep 99d
+    - "--privileged"
 '''
 		}
 	}
