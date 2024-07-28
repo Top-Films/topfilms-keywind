@@ -73,9 +73,9 @@ spec:
 		}
 
 		stage('Docker Push Artifact') {
-			container('dind') {
-				steps {
-					script {
+			steps {
+				script {
+					container('dind') {
 						withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 							sh 'docker -v'
 							sh 'systemctl start docker'
