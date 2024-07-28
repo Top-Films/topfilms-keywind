@@ -8,10 +8,10 @@ spec:
 containers:
   - name: node
     image: node:22-alpine
-	imagePullPolicy: Always
-	command:
-	  - sleep
-	args:
+    imagePullPolicy: Always
+    command:
+      - sleep
+    args:
 	  - 99d
 
   - name: dind
