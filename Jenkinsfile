@@ -27,7 +27,7 @@ spec:
 
 	parameters {
 		string(name: 'BRANCH', defaultValue: params.BRANCH ?: 'main', description: 'Branch to checkout')
-		string(name: 'APP_VERSION', defaultValue: params.VERSION ?: '1.0.0', description: 'Version of the application')
+		string(name: 'APP_VERSION', defaultValue: params.APP_VERSION ?: '1.0.0', description: 'Version of the application')
 	}
 
 	environment { 
@@ -60,7 +60,7 @@ spec:
 		stage('Node Build') {
 			steps {
 				script {
-					sh "npm version ${params.VERSION} --no-git-tag-version"
+					sh "npm version ${params.APP_VERSION} --no-git-tag-version"
 					sh 'npm install'
 					sh 'npm run build'
 					sh 'npm run build:jar'
