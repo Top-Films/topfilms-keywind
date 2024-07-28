@@ -12,15 +12,14 @@ containers:
     command:
       - sleep
     args:
-	  - 99d
-
+	    - 99d
   - name: dind
-	image: docker:27.1.1-dind-alpine3.20
-	imagePullPolicy: Always
-	command:
-	  - sleep
-	args:
-	  - 99d
+    image: docker:27.1.1-dind-alpine3.20
+    imagePullPolicy: Always
+    command:
+      - sleep
+    args:
+	    - 99d
 '''
 		}
 	}
