@@ -102,8 +102,9 @@ spec:
 			steps {
 				container('kubectl') {
 					script {
+						sh "HERE"
 						withCredentials([file(credentialsId: '73ea0e64-9772-40a4-8a6a-bc9a99bbdeb8', variable: 'KUBE_CONFIG')]) {
-							sh 'cp $KUBE_CONFIG $WORKSPACE/.kube/config'
+							sh "cp ${env.KUBE_CONFIG} ${WORKSPACE}/.kube/config"
 							sh 'ls $WORKSPACE -lah'
 							sh 'ls $WORKSPACE/.kube -lah'
 						}
