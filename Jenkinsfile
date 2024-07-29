@@ -18,13 +18,6 @@ spec:
     imagePullPolicy: Always
     securityContext:
       privileged: true
-  - name: kubectl
-    image: d3fk/kubectl:v1.29
-    imagePullPolicy: Always
-    command: 
-    - sleep
-    args: 
-    - 1d
 '''
 		}
 	}
@@ -100,16 +93,9 @@ spec:
 				}
 			}
 			steps {
-				container('kubectl') {
-					script {
-						sh "HERE"
-						withCredentials([file(credentialsId: '73ea0e64-9772-40a4-8a6a-bc9a99bbdeb8', variable: 'KUBE_CONFIG')]) {
-							sh "cp ${env.KUBE_CONFIG} ${WORKSPACE}/.kube/config"
-							sh 'ls $WORKSPACE -lah'
-							sh 'ls $WORKSPACE/.kube -lah'
-						}
-
-						dir("${WORKSPACE}/k8s") {
+				script {
+					dir("${WORKSPACE}/k8s") {
+						withKubeConfig([credentialsId: '73ea0e64-9772-40a4-8a6a-bc9a99bbdeb8']) {
 							checkout scmGit(
 								branches: [[
 									name: "${params.K8S_BRANCH}"
