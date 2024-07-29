@@ -21,10 +21,6 @@ spec:
   - name: kubectl
     image: bitnami/kubectl:1.30.3
     imagePullPolicy: Always
-    command: 
-    - sleep
-    args: 
-    - 1d
 '''
 		}
 	}
