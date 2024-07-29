@@ -21,6 +21,10 @@ spec:
   - name: kubectl
     image: d3fk/kubectl:v1.29
     imagePullPolicy: Always
+    command: 
+    - sleep
+    args: 
+    - 1d
 '''
 		}
 	}
