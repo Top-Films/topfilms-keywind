@@ -10,9 +10,9 @@ spec:
     image: node:22-alpine
     imagePullPolicy: Always
     command: 
-    - 'sleep'
+    - sleep
     args: 
-    - '99d'
+    - 1d
   - name: docker
     image: docker:27-dind
     imagePullPolicy: Always
@@ -21,6 +21,10 @@ spec:
   - name: kubectl
     image: bitnami/kubectl:1.30.3
     imagePullPolicy: Always
+    command: 
+    - sleep
+    args: 
+    - 1d
 '''
 		}
 	}
