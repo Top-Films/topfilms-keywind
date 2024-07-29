@@ -9,6 +9,10 @@ spec:
   - name: node
     image: node:22-alpine
     imagePullPolicy: Always
+    command: 
+    - 'sleep'
+    args: 
+    - '99d'
   - name: docker
     image: docker:27-dind
     imagePullPolicy: Always
