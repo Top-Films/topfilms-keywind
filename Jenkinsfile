@@ -19,7 +19,7 @@ spec:
     securityContext:
       privileged: true
   - name: kubectl
-    image: bitnami/kubectl:1.30.3
+    image: d3fk/kubectl:v1.29
     imagePullPolicy: Always
 '''
 		}
