@@ -1,20 +1,13 @@
 pipeline {
 	agent {
 		kubernetes {
-			defaultContainer 'node'
+			defaultContainer 'buildpack'
 			yaml '''
 kind: Pod
 spec:
   containers:
-  - name: node
-    image: node:22-alpine
-    imagePullPolicy: Always
-    command: 
-    - sleep
-    args: 
-    - 1d
-  - name: docker
-    image: docker:27-dind
+  - name: buildpack
+    image: maxmorhardt/topfilms-jenkins-buildpack:latest
     imagePullPolicy: Always
     securityContext:
       privileged: true
@@ -74,13 +67,11 @@ spec:
 
 		stage('Docker Push Artifact') {
 			steps {
-				container('docker') {
-					script {
-						withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-							sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-							sh 'docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$APP_NAME:$APP_VERSION'
-							sh 'docker push $DOCKER_USERNAME/$APP_NAME:$APP_VERSION'
-						}
+				script {
+					withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+						sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+						sh 'docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$APP_NAME:$APP_VERSION'
+						sh 'docker push $DOCKER_USERNAME/$APP_NAME:$APP_VERSION'
 					}
 				}
 			}
