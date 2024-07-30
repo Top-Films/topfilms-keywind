@@ -11,6 +11,11 @@ spec:
     imagePullPolicy: Always
     securityContext:
       privileged: true
+  - name: dind
+    image: docker:27-dind
+    imagePullPolicy: Always
+    securityContext:
+      privileged: true
 '''
 		}
 	}
@@ -67,11 +72,13 @@ spec:
 
 		stage('Docker Push Artifact') {
 			steps {
-				script {
-					withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-						sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-						sh 'docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$APP_NAME:$APP_VERSION'
-						sh 'docker push $DOCKER_USERNAME/$APP_NAME:$APP_VERSION'
+				container('dind') {
+					script {
+						withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+							sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+							sh 'docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$APP_NAME:$APP_VERSION'
+							sh 'docker push $DOCKER_USERNAME/$APP_NAME:$APP_VERSION'
+						}
 					}
 				}
 			}
