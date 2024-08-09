@@ -6,7 +6,7 @@
 
   <groupId>org.keywind.theme</groupId>
   <artifactId>keywind</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <name>keywind</name>
   <url>https://keywind.org</url>
