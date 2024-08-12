@@ -46,7 +46,7 @@ spec:
 							name: "${params.KEYWIND_BRANCH}"
 						]],
 						userRemoteConfigs: [[
-							credentialsId: '827446b2-c8ac-4420-bcda-87696bb62634',
+							credentialsId: 'github',
 							url: "${env.KEYWIND_GITHUB_URL}"
 						]]
 					)
@@ -76,7 +76,7 @@ spec:
 			steps {
 				container('dind') {
 					script {
-						withCredentials([usernamePassword(credentialsId: '9bbf8bb7-1489-4260-a7a0-afce14eea51b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 							sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
 							sh 'docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$APP_NAME:$APP_VERSION'
 							sh 'docker push $DOCKER_USERNAME/$APP_NAME:$APP_VERSION'
@@ -95,13 +95,13 @@ spec:
 			steps {
 				script {
 					dir("${WORKSPACE}/k8s") {
-						withKubeConfig([credentialsId: '73ea0e64-9772-40a4-8a6a-bc9a99bbdeb8']) {
+						withKubeConfig([credentialsId: 'kube-config']) {
 							checkout scmGit(
 								branches: [[
 									name: "${params.K8S_BRANCH}"
 								]],
 								userRemoteConfigs: [[
-									credentialsId: '827446b2-c8ac-4420-bcda-87696bb62634',
+									credentialsId: 'github',
 									url: "${env.K8S_GITHUB_URL}"
 								]]
 							)
