@@ -39,7 +39,7 @@ spec:
 
 	stages {
 
-		stage('Git Clone') {
+		stage('Git Clone Keywind') {
 			steps {
 				script {
 					checkout scmGit(
@@ -87,7 +87,7 @@ spec:
 			}
 		}
 
-		stage('Build Keycloak') {
+		stage('Git Clone K8s') {
 			when {
 				expression { 
 					DEPLOY_KEYCLOAK == "true"
@@ -106,6 +106,16 @@ spec:
 							]]
 						)
 
+						sh 'ls -lah'
+					}
+				}
+			}
+		}
+
+		stage('Build Keycloak') {
+			steps {
+				script {
+					dir("${WORKSPACE}/k8s") {
 						withKubeConfig([credentialsId: 'kube-config']) {
 							withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 								sh '''
