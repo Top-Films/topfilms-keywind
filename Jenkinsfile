@@ -112,7 +112,7 @@ spec:
 									echo "$DOCKER_PASSWORD" | helm registry login registry-1.docker.io --username $DOCKER_USERNAME --password-stdin
 									helm package helm --app-version=$KEYCLOAK_VERSION --version=$KEYCLOAK_VERSION
 									helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz oci://registry-1.docker.io/$DOCKER_USERNAME
-									helm upgrade $KEYCLOAK_NAME ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz --install --atomic --debug --history-max=3 -n topfilms --set image.tag=$KEYCLOAK_VERSION
+									helm upgrade $KEYCLOAK_NAME ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz --install --atomic --debug --history-max=3 -n keycloak --set image.tag=$KEYCLOAK_VERSION
 								'''
 							}
 						}
