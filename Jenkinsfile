@@ -145,7 +145,6 @@ spec:
 								sh '''
 									cd keycloak
 									echo "$DOCKER_PASSWORD" | helm registry login registry-1.docker.io --username $DOCKER_USERNAME --password-stdin
-									helm repo update
 									helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY/$DOCKER_USERNAME/$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz --install --atomic --debug --history-max=3 -n keycloak --set image.tag=$KEYCLOAK_VERSION
 								'''
 							}
