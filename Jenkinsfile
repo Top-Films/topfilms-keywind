@@ -33,7 +33,7 @@ spec:
 		KEYWIND_GITHUB_URL = 'https://github.com/Top-Films/topfilms-keywind'
 		K8S_GITHUB_URL = 'https://github.com/Top-Films/k8s'
 		KEYCLOAK_NAME = 'keycloak'
-		KEYCLOAK_VERSION = 23.0.7
+		KEYCLOAK_VERSION = '23.0.7'
 	}
 
 	stages {
