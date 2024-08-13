@@ -32,7 +32,8 @@ spec:
 		APP_VERSION = "${params.VERSION}.${env.BUILD_NUMBER}"
 		KEYWIND_GITHUB_URL = 'https://github.com/Top-Films/topfilms-keywind'
 		K8S_GITHUB_URL = 'https://github.com/Top-Films/k8s'
-		DOCKER_REGISTRY = 'oci://registry-1.docker.io'
+		DOCKER_REGISTRY = 'registry-1.docker.io'
+		DOCKER_REGISTRY_FULL = "oci://${env.DOCKER_REGISTRY}"
 		KEYCLOAK_NAME = 'keycloak'
 		KEYCLOAK_VERSION = "23.0.7-${env.BUILD_NUMBER}"
 	}
@@ -121,7 +122,7 @@ spec:
 								cd keycloak
 								echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
 								helm package helm --app-version=$KEYCLOAK_VERSION --version=$KEYCLOAK_VERSION
-								helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz $DOCKER_REGISTRY/$DOCKER_USERNAME
+								helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME
 							'''
 						}
 					}
@@ -147,7 +148,7 @@ spec:
 							sh '''
 								cd keycloak
 								echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
-								helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY/$DOCKER_USERNAME/$KEYCLOAK_NAME --version $KEYCLOAK_VERSION --install --atomic --debug --history-max=3 --namespace keycloak --set image.tag=$KEYCLOAK_VERSION
+								helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME/$KEYCLOAK_NAME --version $KEYCLOAK_VERSION --install --atomic --debug --history-max=3 --namespace keycloak --set image.tag=$KEYCLOAK_VERSION
 							'''
 						}
 					}
