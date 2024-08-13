@@ -32,8 +32,9 @@ spec:
 		APP_VERSION = "${params.VERSION}.${env.BUILD_NUMBER}"
 		KEYWIND_GITHUB_URL = 'https://github.com/Top-Films/topfilms-keywind'
 		K8S_GITHUB_URL = 'https://github.com/Top-Films/k8s'
+		DOCKER_REGISTRY = 'oci://registry-1.docker.io'
 		KEYCLOAK_NAME = 'keycloak'
-		KEYCLOAK_VERSION = '23.0.7'
+		KEYCLOAK_VERSION = "23.0.7-${env.BUILD_NUMBER}"
 	}
 
 	stages {
@@ -86,7 +87,7 @@ spec:
 			}
 		}
 
-		stage('Deploy Keycloak with Keywind') {
+		stage('Build Keycloak') {
 			when {
 				expression { 
 					DEPLOY_KEYCLOAK == "true"
@@ -111,8 +112,41 @@ spec:
 									cd keycloak
 									echo "$DOCKER_PASSWORD" | helm registry login registry-1.docker.io --username $DOCKER_USERNAME --password-stdin
 									helm package helm --app-version=$KEYCLOAK_VERSION --version=$KEYCLOAK_VERSION
-									helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz oci://registry-1.docker.io/$DOCKER_USERNAME
-									helm upgrade $KEYCLOAK_NAME ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz --install --atomic --debug --history-max=3 -n keycloak --set image.tag=$KEYCLOAK_VERSION
+									helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz $DOCKER_REGISTRY/$DOCKER_USERNAME
+								'''
+							}
+						}
+					}
+				}
+			}
+		}
+
+		stage('Deploy Keycloak with Keywind') {
+			when {
+				expression { 
+					DEPLOY_KEYCLOAK == "true"
+				}
+			}
+			steps {
+				script {
+					dir("${WORKSPACE}/k8s") {
+						checkout scmGit(
+							branches: [[
+								name: "${params.K8S_BRANCH}"
+							]],
+							userRemoteConfigs: [[
+								credentialsId: 'github',
+								url: "${env.K8S_GITHUB_URL}"
+							]]
+						)
+
+						withKubeConfig([credentialsId: 'kube-config']) {
+							withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+								sh '''
+									cd keycloak
+									echo "$DOCKER_PASSWORD" | helm registry login registry-1.docker.io --username $DOCKER_USERNAME --password-stdin
+									helm repo update
+									helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY/$DOCKER_USERNAME/$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz --install --atomic --debug --history-max=3 -n keycloak --set image.tag=$KEYCLOAK_VERSION
 								'''
 							}
 						}
