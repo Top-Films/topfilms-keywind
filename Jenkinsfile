@@ -35,7 +35,8 @@ spec:
 		DOCKER_REGISTRY = 'registry-1.docker.io'
 		DOCKER_REGISTRY_FULL = "oci://${env.DOCKER_REGISTRY}"
 		KEYCLOAK_NAME = 'keycloak'
-		KEYCLOAK_VERSION = "23.0.7-${env.BUILD_NUMBER}"
+		KEYCLOAK_VERSION = "23.0.7"
+		KEYCLOAK_VERSION_HELM = "${env.KEYCLOAK_VERSION}-${env.BUILD_NUMBER}"
 	}
 
 	stages {
@@ -121,8 +122,8 @@ spec:
 							sh '''
 								cd keycloak
 								echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
-								helm package helm --app-version=$KEYCLOAK_VERSION --version=$KEYCLOAK_VERSION
-								helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME
+								helm package helm --app-version=$KEYCLOAK_VERSION_HELM --version=$KEYCLOAK_VERSION_HELM
+								helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION_HELM.tgz $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME
 							'''
 						}
 					}
@@ -148,7 +149,7 @@ spec:
 							sh '''
 								cd keycloak
 								echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
-								helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME/$KEYCLOAK_NAME --version $KEYCLOAK_VERSION --install --atomic --debug --history-max=3 --namespace keycloak --set image.tag=$KEYCLOAK_VERSION
+								helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME/$KEYCLOAK_NAME --version $KEYCLOAK_VERSION_HELM --install --atomic --debug --history-max=3 --namespace keycloak --set image.tag=$KEYCLOAK_VERSION
 							'''
 						}
 					}
