@@ -116,15 +116,13 @@ spec:
 			steps {
 				script {
 					dir("${WORKSPACE}/k8s") {
-						withKubeConfig([credentialsId: 'kube-config']) {
-							withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-								sh '''
-									cd keycloak
-									echo "$DOCKER_PASSWORD" | helm registry login registry-1.docker.io --username $DOCKER_USERNAME --password-stdin
-									helm package helm --app-version=$KEYCLOAK_VERSION --version=$KEYCLOAK_VERSION
-									helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz $DOCKER_REGISTRY/$DOCKER_USERNAME
-								'''
-							}
+						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+							sh '''
+								cd keycloak
+								echo "$DOCKER_PASSWORD" | helm registry login registry-1.docker.io --username $DOCKER_USERNAME --password-stdin
+								helm package helm --app-version=$KEYCLOAK_VERSION --version=$KEYCLOAK_VERSION
+								helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz $DOCKER_REGISTRY/$DOCKER_USERNAME
+							'''
 						}
 					}
 				}
@@ -140,24 +138,17 @@ spec:
 			steps {
 				script {
 					dir("${WORKSPACE}/k8s") {
-						checkout scmGit(
-							branches: [[
-								name: "${params.K8S_BRANCH}"
-							]],
-							userRemoteConfigs: [[
-								credentialsId: 'github',
-								url: "${env.K8S_GITHUB_URL}"
-							]]
-						)
+						withCredentials([
+							usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'), 
+							file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')
+						]) {
+							sh 'sudo cp $KUBE_CONFIG ${WORKSPACE}/.kube/config'
 
-						withKubeConfig([credentialsId: 'kube-config']) {
-							withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-								sh '''
-									cd keycloak
-									echo "$DOCKER_PASSWORD" | helm registry login registry-1.docker.io --username $DOCKER_USERNAME --password-stdin
-									helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY/$DOCKER_USERNAME/$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz --install --atomic --debug --history-max=3 -n keycloak --set image.tag=$KEYCLOAK_VERSION
-								'''
-							}
+							sh '''
+								cd keycloak
+								echo "$DOCKER_PASSWORD" | helm registry login registry-1.docker.io --username $DOCKER_USERNAME --password-stdin
+								helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY/$DOCKER_USERNAME/$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz --install --atomic --debug --history-max=3 -n keycloak --set image.tag=$KEYCLOAK_VERSION
+							'''
 						}
 					}
 				}
