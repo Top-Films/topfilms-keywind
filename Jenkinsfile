@@ -139,19 +139,16 @@ spec:
 			}
 			steps {
 				script {
-					dir("${WORKSPACE}/k8s") {
-						withCredentials([
-							usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'), 
-							file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')
-						]) {
-							sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG ${WORKSPACE}/.kube/config'
+					withCredentials([
+						usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'), 
+						file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')
+					]) {
+						sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG ${WORKSPACE}/.kube/config'
 
-							sh '''
-								cd keycloak
-								echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
-								helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME/$KEYCLOAK_NAME --version $KEYCLOAK_VERSION_HELM --install --atomic --debug --history-max=3 --namespace keycloak --set image.tag=$KEYCLOAK_VERSION
-							'''
-						}
+						sh '''
+							echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
+							helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME/$KEYCLOAK_NAME --version $KEYCLOAK_VERSION_HELM --install --atomic --debug --history-max=3 --namespace keycloak --set image.tag=$KEYCLOAK_VERSION
+						'''
 					}
 				}
 			}
