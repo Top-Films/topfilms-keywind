@@ -142,7 +142,7 @@ spec:
 							usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'), 
 							file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')
 						]) {
-							sh 'sudo cp $KUBE_CONFIG ${WORKSPACE}/.kube/config'
+							sh 'cp $KUBE_CONFIG ${WORKSPACE}/.kube/config'
 
 							sh '''
 								cd keycloak
