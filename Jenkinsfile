@@ -119,7 +119,7 @@ spec:
 						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 							sh '''
 								cd keycloak
-								echo "$DOCKER_PASSWORD" | helm registry login registry-1.docker.io --username $DOCKER_USERNAME --password-stdin
+								echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
 								helm package helm --app-version=$KEYCLOAK_VERSION --version=$KEYCLOAK_VERSION
 								helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz $DOCKER_REGISTRY/$DOCKER_USERNAME
 							'''
@@ -146,8 +146,8 @@ spec:
 
 							sh '''
 								cd keycloak
-								echo "$DOCKER_PASSWORD" | helm registry login registry-1.docker.io --username $DOCKER_USERNAME --password-stdin
-								helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY/$DOCKER_USERNAME/$KEYCLOAK_NAME-$KEYCLOAK_VERSION.tgz --install --atomic --debug --history-max=3 -n keycloak --set image.tag=$KEYCLOAK_VERSION
+								echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
+								helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY/$DOCKER_USERNAME/$KEYCLOAK_NAME --version $KEYCLOAK_VERSION --install --atomic --debug --history-max=3 --namespace keycloak --set image.tag=$KEYCLOAK_VERSION
 							'''
 						}
 					}
