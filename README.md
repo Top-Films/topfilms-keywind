@@ -1,11 +1,17 @@
-# :wind_face: Keywind
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Top-Films/assets/main/png/top-films-logo-white-transparent.png" width="400" alt="logo"/>
+  <br><br>
+</p>
 
-Keywind is a component-based Keycloak Login Theme built with [Tailwind CSS](https://github.com/tailwindlabs/tailwindcss) and [Alpine.js](https://github.com/alpinejs/alpine).
+![TypeScript](https://img.shields.io/badge/-TypeScript-black?style=for-the-badge&logoColor=white&logo=typescript&color=2F73BF)
+![Keycloak](https://img.shields.io/badge/Keycloak-23.0.7-blue?style=for-the-badge&logo=keycloak)
 
-![Preview](./preview.png)
+![Static Badge](https://img.shields.io/badge/license-Apache%202.0-green)
 
-### Styled Pages
+## Overview
+This repository holds the version of Keywind used for Top Films. Keywind is an open source theme used with Keycloak.
 
+## Styled Pages
 - Error
 - Login
 - Login Config TOTP
@@ -29,8 +35,7 @@ Keywind is a component-based Keycloak Login Theme built with [Tailwind CSS](http
 - WebAuthn Error
 - WebAuthn Register
 
-### Identity Provider Icons
-
+## Identity Provider Icons
 - Apple
 - Bitbucket
 - Discord
@@ -48,67 +53,23 @@ Keywind is a component-based Keycloak Login Theme built with [Tailwind CSS](http
 - Stack Overflow
 - Twitter
 
-## Installation
-
-Keywind has been designed with component-based architecture from the start, and **you can customize as little or as much Keywind as you need**:
-
-1. [Deploy Keywind Login Theme](https://www.keycloak.org/docs/latest/server_development/#deploying-themes)
-2. [Create your own Login Theme](https://www.keycloak.org/docs/latest/server_development/#creating-a-theme)
-3. Specify parent theme in [theme properties](https://www.keycloak.org/docs/latest/server_development/#theme-properties):
-
-```
-parent=keywind
-```
-
-4. Brand and customize components with [FreeMarker](https://freemarker.apache.org/docs/dgui_quickstart_template.html)
-
-## Customization
-
-### Theme
-
-When you do need to customize a palette, you can configure your colors under the `colors` key in the `theme` section of Tailwind config file:
-
-`tailwind.config.js`
-
-```js
-module.exports = {
-  theme: {
-    extend: {
-      colors: {
-        primary: colors.red,
-      },
-    },
-  },
-};
-```
-
-Read more about Tailwind CSS configuration in the [documentation](https://tailwindcss.com/docs/configuration).
-
-### Components
-
-You can update Keywind components in your own child theme. For example, create a copy of the `body` component and change the background:
-
-`theme/mytheme/login/components/atoms/body.ftl`
-
-```
-<#macro kw>
-  <body class="bg-primary-100">
-    <#nested>
-  </body>
-</#macro>
-```
-
 ## Build
-
 When you're ready to deploy your own theme, run the build command to generate a static production build.
 
 ```bash
-pnpm install
-pnpm build
+npm install
+npm run build
+npm run build:jar
 ```
 
-To deploy a theme as an archive, create a JAR archive with the theme resources.
+## Contributing
+Contributions are welcome! If you'd like to contribute to the project, please follow these steps:
 
-```bash
-pnpm build:jar
-```
+- Fork the repository.
+- Create a new branch for your feature or bug fix.
+- Make your changes and commit them.
+- Push your changes to your fork.
+- Submit a pull request to the main repository.
+
+## License
+This project is licensed under the Apache 2.0 License.
