@@ -75,13 +75,27 @@ spec:
 			}
 		}
 
-		stage('Docker Push Artifact') {
+		stage('Docker Push Artifact ARM') {
 			steps {
 				container('dind') {
 					script {
 						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 							sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-							sh 'docker buildx build --platform linux/arm64/v8,linux/amd64 . -t $DOCKER_USERNAME/$APP_NAME:$APP_VERSION -t $DOCKER_USERNAME/$APP_NAME:latest'
+							sh 'docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$APP_NAME:$APP_VERSION -t $DOCKER_USERNAME/$APP_NAME:latest'
+							sh 'docker push $DOCKER_USERNAME/$APP_NAME -a'
+						}
+					}
+				}
+			}
+		}
+
+		stage('Docker Push Artifact AMD') {
+			steps {
+				container('dind') {
+					script {
+						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+							sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+							sh 'docker buildx build --platform linux/amd64 . -t $DOCKER_USERNAME/$APP_NAME:$APP_VERSION -t $DOCKER_USERNAME/$APP_NAME:latest'
 							sh 'docker push $DOCKER_USERNAME/$APP_NAME -a'
 						}
 					}
