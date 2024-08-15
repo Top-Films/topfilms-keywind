@@ -81,7 +81,7 @@ spec:
 					script {
 						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 							sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-							sh 'docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$APP_NAME:$APP_VERSION'
+							sh 'docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$APP_NAME:$APP_VERSION -t $DOCKER_USERNAME/$APP_NAME:latest'
 							sh 'docker push $DOCKER_USERNAME/$APP_NAME:$APP_VERSION'
 						}
 					}
@@ -115,6 +115,11 @@ spec:
 		}
 
 		stage('Build Keycloak') {
+			when {
+				expression { 
+					DEPLOY_KEYCLOAK == "true"
+				}
+			}
 			steps {
 				script {
 					dir("${WORKSPACE}/k8s") {
