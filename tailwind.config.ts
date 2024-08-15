@@ -3,9 +3,6 @@ import colors from 'tailwindcss/colors';
 
 export default {
   content: ['./theme/**/*.ftl'],
-  experimental: {
-    optimizeUniversalDefaults: true,
-  },
   plugins: [require('@tailwindcss/forms')],
   theme: {
     extend: {

@@ -1,1 +1,1 @@
-import{m as o}from"./assets/module.esm-19268bcb.js";window.Alpine=o;o.start();
+import{m}from"./assets/module.esm-BVmYX9MG.js";window.Alpine=m;m.start();
