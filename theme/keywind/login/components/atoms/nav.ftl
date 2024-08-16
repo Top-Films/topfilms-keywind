@@ -1,5 +1,5 @@
 <#macro kw>
-  <div class="flex justify-around">
+  <div class="mt-2">
     <#nested>
   </div>
 </#macro>
