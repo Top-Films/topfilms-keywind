@@ -1,8 +1,16 @@
 <#macro kw>
-  <body class="bg-secondary-100 flex flex-col items-center" style="margin-top: 2rem;">
-    <#nested>
-	<a href="https://topfilms.io/contact" style="display: inline; margin-right: 10px">Contact</a>
-	<a href="https://topfilms.io/privacy" style="display: inline; margin-right: 10px">Privacy</a>
-	<a href="https://topfilms.io/terms" style="display: inline;">Terms</a>
-  </body>
+	<style>
+		a {color:red;}
+		.body-margin {
+			margin-top: 2rem;
+		}
+	</style>
+	<body class="bg-secondary-100 flex flex-col items-center body-margin">
+    	<#nested>
+		<div class="gap-4 grid grid-cols-3">
+			<a href="https://topfilms.io/contact" style="">Contact</a>
+			<a href="https://topfilms.io/privacy" style="">Privacy</a>
+			<a href="https://topfilms.io/terms" style="">Terms</a>
+		</div>
+	</body>
 </#macro>
