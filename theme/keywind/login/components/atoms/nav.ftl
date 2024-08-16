@@ -1,5 +1,5 @@
 <#macro kw>
-  <div class="mt-1 text-center">
+  <div class="text-center">
     <#nested>
   </div>
 </#macro>
