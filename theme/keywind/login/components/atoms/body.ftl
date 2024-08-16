@@ -1,7 +1,7 @@
 <#macro kw>
 	<style>
 		.link {
-			color: #909090;
+			color: #4c5563;
 			font-size: 14px;
 		}
 
@@ -17,7 +17,7 @@
 	</style>
 	<body class="bg-secondary-100 flex flex-col items-center body-margin">
     	<#nested>
-		<div class="gap-4 grid grid-cols-3">
+		<div class="gap-4 grid grid-cols-3 mt-1">
 			<a href="https://topfilms.io/contact" class="link">Contact</a>
 			<a href="https://topfilms.io/privacy" class="link">Privacy</a>
 			<a href="https://topfilms.io/terms" class="link">Terms</a>
