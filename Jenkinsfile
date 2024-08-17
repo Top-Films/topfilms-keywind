@@ -142,13 +142,13 @@ spec:
 							sh '''
 								cd $KEYCLOAK_NAME
 
-								export KEYCLOAK_ADMIN_USERNAME_B64=(echo $KEYCLOAK_ADMIN_USERNAME | base64)
-								export KEYCLOAK_ADMIN_PASSWORD_B64=(echo $KEYCLOAK_ADMIN_PASSWORD | base64)
-								export KEYCLOAK_DB_USERNAME_B64=(echo $KEYCLOAK_DB_USERNAME | base64)
-								export KEYCLOAK_DB_PASSWORD_B64=(echo $KEYCLOAK_DB_PASSWORD | base64)
-								export KEYCLOAK_DB_HOST_B64=(echo $KEYCLOAK_DB_HOST | base64)
-								export KEYCLOAK_CERT_B64=(echo $KEYCLOAK_CERT | base64)
-								export KEYCLOAK_CERT_PRIVATE_KEY_B64=(echo $KEYCLOAK_CERT_PRIVATE_KEY | base64)
+								export KEYCLOAK_ADMIN_USERNAME_B64=$(echo $KEYCLOAK_ADMIN_USERNAME | base64)
+								export KEYCLOAK_ADMIN_PASSWORD_B64=$(echo $KEYCLOAK_ADMIN_PASSWORD | base64)
+								export KEYCLOAK_DB_USERNAME_B64=$(echo $KEYCLOAK_DB_USERNAME | base64)
+								export KEYCLOAK_DB_PASSWORD_B64=$(echo $KEYCLOAK_DB_PASSWORD | base64)
+								export KEYCLOAK_DB_HOST_B64=$(echo $KEYCLOAK_DB_HOST | base64)
+								export KEYCLOAK_CERT_B64=$(echo $KEYCLOAK_CERT | base64)
+								export KEYCLOAK_CERT_PRIVATE_KEY_B64=$(echo $KEYCLOAK_CERT_PRIVATE_KEY | base64)
 							'''
 
 							sh """
