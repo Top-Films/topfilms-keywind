@@ -139,18 +139,16 @@ spec:
 						]) {
 							sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
 
+							KEYCLOAK_ADMIN_USERNAME_B64 = sh "echo $KEYCLOAK_ADMIN_USERNAME | base64"
+							KEYCLOAK_ADMIN_PASSWORD_B64 = sh "echo $KEYCLOAK_ADMIN_PASSWORD | base64"
+							KEYCLOAK_DB_USERNAME_B64 = sh "echo $KEYCLOAK_DB_USERNAME | base64"
+							KEYCLOAK_DB_PASSWORD_B64 = sh "echo $KEYCLOAK_DB_PASSWORD | base64"
+							KEYCLOAK_DB_HOST_B64 = sh "echo $KEYCLOAK_DB_HOST | base64"
+							KEYCLOAK_CERT_B64 = sh "echo $KEYCLOAK_CERT | base64"
+							KEYCLOAK_CERT_PRIVATE_KEY_B64 = sh "echo $KEYCLOAK_CERT_PRIVATE_KEY | base64"
+
 							sh """
 								cd $KEYCLOAK_NAME
-
-								set -x
-
-								export KEYCLOAK_ADMIN_USERNAME_B64=(echo $KEYCLOAK_ADMIN_USERNAME | base64)
-								export KEYCLOAK_ADMIN_PASSWORD_B64=(echo $KEYCLOAK_ADMIN_PASSWORD | base64)
-								export KEYCLOAK_DB_USERNAME_B64=(echo $KEYCLOAK_DB_USERNAME | base64)
-								export KEYCLOAK_DB_PASSWORD_B64=(echo $KEYCLOAK_DB_PASSWORD | base64)
-								export KEYCLOAK_DB_HOST_B64=(echo $KEYCLOAK_DB_HOST | base64)
-								export KEYCLOAK_CERT_B64=(echo $KEYCLOAK_CERT | base64)
-								export KEYCLOAK_CERT_PRIVATE_KEY_B64=(echo $KEYCLOAK_CERT_PRIVATE_KEY | base64)
 
 								sed -i "s/<KEYCLOAK_ADMIN_USERNAME>/$KEYCLOAK_ADMIN_USERNAME_B64/g" secret.yaml
 								sed -i "s/<KEYCLOAK_ADMIN_PASSWORD>/$KEYCLOAK_ADMIN_PASSWORD_B64/g" secret.yaml
@@ -159,8 +157,6 @@ spec:
 								sed -i "s/<KEYCLOAK_DB_HOST>/$KEYCLOAK_DB_HOST_B64/g" secret.yaml
 								sed -i "s/<KEYCLOAK_CERT>/$KEYCLOAK_CERT_B64/g" secret.yaml
 								sed -i "s/<KEYCLOAK_CERT_PRIVATE_KEY>/$KEYCLOAK_CERT_PRIVATE_KEY_B64/g" secret.yaml
-
-								set +x
 							"""
 
 							sh """
