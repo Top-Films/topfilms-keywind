@@ -1,10 +1,5 @@
 <#macro kw>
-  <style>
-	.no-margin {
-		margin: 0
-	}
-  </style>
-  <div class="text-center no-margin">
+  <div class="text-center">
     <#nested>
   </div>
 </#macro>
