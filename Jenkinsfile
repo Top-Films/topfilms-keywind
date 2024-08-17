@@ -162,7 +162,7 @@ spec:
 							sh """
 								cd $KEYCLOAK_NAME
 
-								kubectl apply -f secret.yaml
+								kubectl apply -f secret.yaml -n $KEYCLOAK_NAME
 							"""
 						}
 					}
