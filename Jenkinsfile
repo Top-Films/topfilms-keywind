@@ -22,20 +22,23 @@ spec:
 
 	parameters {
 		string(name: 'KEYWIND_BRANCH', defaultValue: params.KEYWIND_BRANCH ?: 'main', description: 'Branch to checkout in keywind repo')
-		string(name: 'VERSION', defaultValue: params.APP_VERSION ?: '1.0', description: 'Major and minor version of the application')
+		string(name: 'KEYWIND_VERSION', defaultValue: params.KEYWIND_VERSION ?: '1.0', description: 'Major and minor version of the application')
 		booleanParam(name: 'DEPLOY_KEYCLOAK', defaultValue: "false", description: 'Deploy Keycloak with new Keywind theme')
+		string(name: 'KEYCLOAK_VERSION', defaultValue: '23.0.7', description: 'Full version of keycloak')
 		string(name: 'K8S_BRANCH', defaultValue: params.K8S_BRANCH ?: 'main', description: 'Branch to checkout in k8s repo')
 	}
 
 	environment { 
-		APP_NAME = 'topfilms-keywind'
-		APP_VERSION = "${params.VERSION}.${env.BUILD_NUMBER}"
+		KEYWIND_NAME = 'topfilms-keywind'
+		KEYWIND_VERSION_FULL = "${params.KEYWIND_VERSION}.${env.BUILD_NUMBER}"
 		KEYWIND_GITHUB_URL = 'https://github.com/Top-Films/topfilms-keywind'
-		K8S_GITHUB_URL = 'https://github.com/Top-Films/k8s'
+
 		DOCKER_REGISTRY = 'registry-1.docker.io'
 		DOCKER_REGISTRY_FULL = "oci://${env.DOCKER_REGISTRY}"
+
+		K8S_GITHUB_URL = 'https://github.com/Top-Films/k8s'
+		
 		KEYCLOAK_NAME = 'keycloak'
-		KEYCLOAK_VERSION = "23.0.7"
 		KEYCLOAK_VERSION_HELM = "${env.KEYCLOAK_VERSION}-${env.BUILD_NUMBER}"
 	}
 
@@ -63,10 +66,12 @@ spec:
 		stage('Node Build') {
 			steps {
 				script {
-					sh "npm version ${env.APP_VERSION} --no-git-tag-version"
+					sh "npm version ${env.KEYWIND_VERSION_FULL} --no-git-tag-version"
+
 					sh 'npm install'
 					sh 'npm run build'
 					sh 'npm run build:jar'
+
 					sh 'cd out && unzip keywind.jar'
 
 					sh 'ls -lah'
@@ -81,8 +86,9 @@ spec:
 					script {
 						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 							sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-							sh 'docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$APP_NAME:$APP_VERSION -t $DOCKER_USERNAME/$APP_NAME:latest'
-							sh 'docker push $DOCKER_USERNAME/$APP_NAME -a'
+
+							sh 'docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$KEYWIND_NAME:$KEYWIND_VERSION_FULL -t $DOCKER_USERNAME/$KEYWIND_NAME:latest'
+							sh 'docker push $DOCKER_USERNAME/$KEYWIND_NAME -a'
 						}
 					}
 				}
@@ -114,6 +120,53 @@ spec:
 			}
 		}
 
+		stage('Keycloak File Substitutions with Secrets') {
+			when {
+				expression { 
+					DEPLOY_KEYCLOAK == "true"
+				}
+			}
+			steps {
+				script {
+					dir("${WORKSPACE}/k8s") {
+						withCredentials([
+							usernamePassword(credentialsId: 'keycloak-admin', usernameVariable: 'KEYCLOAK_ADMIN_USERNAME', passwordVariable: 'KEYCLOAK_ADMIN_PASSWORD'),
+							usernamePassword(credentialsId: 'keycloak-db', usernameVariable: 'KEYCLOAK_DB_USERNAME', passwordVariable: 'KEYCLOAK_DB_PASSWORD'),
+							string(credentialsId: 'keycloak-admin', usernameVariable: 'KEYCLOAK_ADMIN_USERNAME', passwordVariable: 'KEYCLOAK_ADMIN_PASSWORD'),
+						]) {
+							sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
+
+							sh """
+								cd $KEYCLOAK_NAME
+
+								KEYCLOAK_ADMIN_USERNAME_B64=(echo $KEYCLOAK_ADMIN_USERNAME | base64)
+								KEYCLOAK_ADMIN_PASSWORD_B64=(echo $KEYCLOAK_ADMIN_PASSWORD | base64)
+								KEYCLOAK_DB_USERNAME_B64=(echo $KEYCLOAK_DB_USERNAME | base64)
+								KEYCLOAK_DB_PASSWORD_B64=(echo $KEYCLOAK_DB_PASSWORD | base64)
+								KEYCLOAK_DB_HOST_B64=(echo $KEYCLOAK_DB_HOST | base64)
+								KEYCLOAK_CERT_B64=(echo $KEYCLOAK_CERT | base64)
+								KEYCLOAK_CERT_PRIVATE_KEY_B64=(echo $EYCLOAK_CERT_PRIVATE_KEY | base64)
+
+								sed -i "s/<KEYCLOAK_ADMIN_USERNAME>/$KEYCLOAK_ADMIN_USERNAME_B64/g" secret.yaml
+								sed -i "s/<KEYCLOAK_ADMIN_PASSWORD>/$KEYCLOAK_ADMIN_PASSWORD_B64/g" secret.yaml
+								sed -i "s/<KEYCLOAK_DB_USERNAME>/$KEYCLOAK_DB_USERNAME_B64/g" secret.yaml
+								sed -i "s/<KEYCLOAK_DB_PASSWORD>/$KEYCLOAK_DB_PASSWORD_B64/g" secret.yaml
+								sed -i "s/<KEYCLOAK_DB_HOST>/$KEYCLOAK_DB_HOST_B64/g" secret.yaml
+								sed -i "s/<KEYCLOAK_CERT>/$KEYCLOAK_CERT_B64/g" secret.yaml
+								sed -i "s/<KEYCLOAK_CERT_PRIVATE_KEY>/$KEYCLOAK_CERT_PRIVATE_KEY_B64/g" secret.yaml
+							"""
+
+							sh """
+								cd $KEYCLOAK_NAME
+
+								kubectl apply -f secret.yaml
+							"""
+						}
+					}
+				}
+			}
+		}
+
 		stage('Build Keycloak') {
 			when {
 				expression { 
@@ -125,8 +178,10 @@ spec:
 					dir("${WORKSPACE}/k8s") {
 						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 							sh '''
-								cd keycloak
+								cd $KEYCLOAK_NAME
+
 								echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
+
 								helm package helm --app-version=$KEYCLOAK_VERSION_HELM --version=$KEYCLOAK_VERSION_HELM
 								helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION_HELM.tgz $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME
 							'''
@@ -136,7 +191,7 @@ spec:
 			}
 		}
 
-		stage('Deploy Keycloak with Keywind') {
+		stage('Deploy Keycloak') {
 			when {
 				expression { 
 					DEPLOY_KEYCLOAK == "true"
@@ -148,7 +203,7 @@ spec:
 						usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'), 
 						file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')
 					]) {
-						sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG ${WORKSPACE}/.kube/config'
+						sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
 
 						sh '''
 							echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
