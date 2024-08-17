@@ -132,7 +132,9 @@ spec:
 						withCredentials([
 							usernamePassword(credentialsId: 'keycloak-admin', usernameVariable: 'KEYCLOAK_ADMIN_USERNAME', passwordVariable: 'KEYCLOAK_ADMIN_PASSWORD'),
 							usernamePassword(credentialsId: 'keycloak-db', usernameVariable: 'KEYCLOAK_DB_USERNAME', passwordVariable: 'KEYCLOAK_DB_PASSWORD'),
-							string(credentialsId: 'keycloak-admin', usernameVariable: 'KEYCLOAK_ADMIN_USERNAME', passwordVariable: 'KEYCLOAK_ADMIN_PASSWORD'),
+							string(credentialsId: 'keycloak-db-host', variable: 'KEYCLOAK_DB_HOST'),
+							file(credentialsId: 'keycloak-cert', variable: 'KEYCLOAK_CERT'),
+							file(credentialsId: 'keycloak-cert-private-key', variable: 'KEYCLOAK_CERT_PRIVATE_KEY')
 						]) {
 							sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
 
