@@ -198,9 +198,19 @@ spec:
 				script {
 					withCredentials([
 						usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'), 
+						file(credentialsId: 'ca-cert', variable: 'CA_CERT'),
+						file(credentialsId: 'ca-cert-private-key', variable: 'CA_CERT_PRIVATE_KEY'),
 						file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')
 					]) {
 						sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
+
+						sh '''
+							cp $CA_CERT ./cert.pem
+							cp $CA_CERT_PRIVATE_KEY ./key.pem
+
+							kubectl delete secret auth.topfilms.io-tls -n keycloak || true
+							kubectl create secret tls auth.topfilms.io-tls --cert=cert.pem --key=key.pem -n keycloak
+						'''
 
 						sh '''
 							echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
