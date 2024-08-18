@@ -151,21 +151,21 @@ spec:
 							sh '''
 								cd $KEYCLOAK_NAME
 								
-								sed -i "s/<KEYCLOAK_ADMIN_USERNAME>/$(echo $KEYCLOAK_ADMIN_USERNAME | base64)/g" secret.yaml
-								sed -i "s/<KEYCLOAK_ADMIN_PASSWORD>/$(echo $KEYCLOAK_ADMIN_PASSWORD | base64)/g" secret.yaml
-								sed -i "s/<KEYCLOAK_DB_USERNAME>/$(echo $KEYCLOAK_DB_USERNAME | base64)/g" secret.yaml
-								sed -i "s/<KEYCLOAK_DB_PASSWORD>/$(echo $KEYCLOAK_DB_PASSWORD | base64)/g" secret.yaml
-								sed -i "s/<KEYCLOAK_DB_HOST>/$(echo $KEYCLOAK_DB_HOST | base64)/g" secret.yaml
+								sed -i "s/<KEYCLOAK_ADMIN_USERNAME>/'$(echo $KEYCLOAK_ADMIN_USERNAME | base64)'/g" secret.yaml
+								sed -i "s/<KEYCLOAK_ADMIN_PASSWORD>/'$(echo $KEYCLOAK_ADMIN_PASSWORD | base64)'/g" secret.yaml
+								sed -i "s/<KEYCLOAK_DB_USERNAME>/'$(echo $KEYCLOAK_DB_USERNAME | base64)'/g" secret.yaml
+								sed -i "s/<KEYCLOAK_DB_PASSWORD>/'$(echo $KEYCLOAK_DB_PASSWORD | base64)'/g" secret.yaml
+								sed -i "s/<KEYCLOAK_DB_HOST>/'$(echo $KEYCLOAK_DB_HOST | base64)'/g" secret.yaml
 
 								echo "============================KEYCLOAK_CERT================================="
 								cat $WORKSPACE/cert.pem | base64
 
-								sed -i "s/<KEYCLOAK_CERT>/$(cat $WORKSPACE/cert.pem | base64)/g" secret.yaml
+								sed -i "s/<KEYCLOAK_CERT>/'$(cat $WORKSPACE/cert.pem | base64)'/g" secret.yaml
 
 								echo "============================KEYCLOAK_CERT_PRIVATE_KEY================================="
 								cat $WORKSPACE/key.pem | base64
 
-								sed -i "s/<KEYCLOAK_CERT_PRIVATE_KEY>/$(cat $WORKSPACE/key.pem | base64)/g" secret.yaml
+								sed -i "s/<KEYCLOAK_CERT_PRIVATE_KEY>/'$(cat $WORKSPACE/key.pem | base64)'/g" secret.yaml
 
 								cat secret.yaml
 							'''
