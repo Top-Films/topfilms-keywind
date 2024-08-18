@@ -142,26 +142,14 @@ spec:
 							sh '''
 								cd $KEYCLOAK_NAME
 
-								export KEYCLOAK_ADMIN_USERNAME_B64=$(echo $KEYCLOAK_ADMIN_USERNAME | base64)
-								export KEYCLOAK_ADMIN_PASSWORD_B64=$(echo $KEYCLOAK_ADMIN_PASSWORD | base64)
-								export KEYCLOAK_DB_USERNAME_B64=$(echo $KEYCLOAK_DB_USERNAME | base64)
-								export KEYCLOAK_DB_PASSWORD_B64=$(echo $KEYCLOAK_DB_PASSWORD | base64)
-								export KEYCLOAK_DB_HOST_B64=$(echo $KEYCLOAK_DB_HOST | base64)
-								export KEYCLOAK_CERT_B64=$(echo $KEYCLOAK_CERT | base64)
-								export KEYCLOAK_CERT_PRIVATE_KEY_B64=$(echo $KEYCLOAK_CERT_PRIVATE_KEY | base64)
+								sed -i "s/<KEYCLOAK_ADMIN_USERNAME>/$(echo $KEYCLOAK_ADMIN_USERNAME | base64)/g" secret.yaml
+								sed -i "s/<KEYCLOAK_ADMIN_PASSWORD>/$(echo $KEYCLOAK_ADMIN_PASSWORD | base64)/g" secret.yaml
+								sed -i "s/<KEYCLOAK_DB_USERNAME>/$(echo $KEYCLOAK_DB_USERNAME | base64)/g" secret.yaml
+								sed -i "s/<KEYCLOAK_DB_PASSWORD>/$(echo $KEYCLOAK_DB_PASSWORD | base64)/g" secret.yaml
+								sed -i "s/<KEYCLOAK_DB_HOST>/$(echo $KEYCLOAK_DB_HOST | base64)/g" secret.yaml
+								sed -i "s/<KEYCLOAK_CERT>/$(echo $KEYCLOAK_CERT | base64)/g" secret.yaml
+								sed -i "s/<KEYCLOAK_CERT_PRIVATE_KEY>/$(echo $KEYCLOAK_CERT_PRIVATE_KEY | base64)/g" secret.yaml
 							'''
-
-							sh """
-								cd $KEYCLOAK_NAME
-
-								sed -i "s/<KEYCLOAK_ADMIN_USERNAME>/$KEYCLOAK_ADMIN_USERNAME_B64/g" secret.yaml
-								sed -i "s/<KEYCLOAK_ADMIN_PASSWORD>/$KEYCLOAK_ADMIN_PASSWORD_B64/g" secret.yaml
-								sed -i "s/<KEYCLOAK_DB_USERNAME>/$KEYCLOAK_DB_USERNAME_B64/g" secret.yaml
-								sed -i "s/<KEYCLOAK_DB_PASSWORD>/$KEYCLOAK_DB_PASSWORD_B64/g" secret.yaml
-								sed -i "s/<KEYCLOAK_DB_HOST>/$KEYCLOAK_DB_HOST_B64/g" secret.yaml
-								sed -i "s/<KEYCLOAK_CERT>/$KEYCLOAK_CERT_B64/g" secret.yaml
-								sed -i "s/<KEYCLOAK_CERT_PRIVATE_KEY>/$KEYCLOAK_CERT_PRIVATE_KEY_B64/g" secret.yaml
-							"""
 
 							sh """
 								cd $KEYCLOAK_NAME
