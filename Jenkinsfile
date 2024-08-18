@@ -130,42 +130,25 @@ spec:
 				script {
 					dir("${WORKSPACE}/k8s") {
 						withCredentials([
-							usernamePassword(credentialsId: 'keycloak-admin', usernameVariable: 'KEYCLOAK_ADMIN_USERNAME', passwordVariable: 'KEYCLOAK_ADMIN_PASSWORD'),
-							usernamePassword(credentialsId: 'keycloak-db', usernameVariable: 'KEYCLOAK_DB_USERNAME', passwordVariable: 'KEYCLOAK_DB_PASSWORD'),
-							string(credentialsId: 'keycloak-db-host', variable: 'KEYCLOAK_DB_HOST'),
-							file(credentialsId: 'keycloak-cert', variable: 'KEYCLOAK_CERT'),
-							file(credentialsId: 'keycloak-cert-private-key', variable: 'KEYCLOAK_CERT_PRIVATE_KEY'),
+							usernamePassword(credentialsId: 'keycloak-admin-b64', usernameVariable: 'KEYCLOAK_ADMIN_USERNAME_B64', passwordVariable: 'KEYCLOAK_ADMIN_PASSWORD_B64'),
+							usernamePassword(credentialsId: 'keycloak-db-b64', usernameVariable: 'KEYCLOAK_DB_USERNAME_B64', passwordVariable: 'KEYCLOAK_DB_PASSWORD_B64'),
+							string(credentialsId: 'keycloak-db-host-b64', variable: 'KEYCLOAK_DB_HOST_B64'),
+							string(credentialsId: 'keycloak-cert-b64', variable: 'KEYCLOAK_CERT_B64'),
+							string(credentialsId: 'keycloak-cert-private-key-b64', variable: 'KEYCLOAK_CERT_PRIVATE_KEY_B64'),
 							file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')
 						]) {
-							sh '''
-								mkdir -p $WORKSPACE/.kube
-								cp $KUBE_CONFIG $WORKSPACE/.kube/config
-								
-								cp $KEYCLOAK_CERT $WORKSPACE/cert.pem
-								cp $KEYCLOAK_CERT_PRIVATE_KEY $WORKSPACE/key.pem
-
-								ls -lah
-								pwd
-							'''
+							sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
 
 							sh '''
 								cd $KEYCLOAK_NAME
 								
-								sed -i "s/<KEYCLOAK_ADMIN_USERNAME>/'$(echo $KEYCLOAK_ADMIN_USERNAME | base64)'/g" secret.yaml
-								sed -i "s/<KEYCLOAK_ADMIN_PASSWORD>/'$(echo $KEYCLOAK_ADMIN_PASSWORD | base64)'/g" secret.yaml
-								sed -i "s/<KEYCLOAK_DB_USERNAME>/'$(echo $KEYCLOAK_DB_USERNAME | base64)'/g" secret.yaml
-								sed -i "s/<KEYCLOAK_DB_PASSWORD>/'$(echo $KEYCLOAK_DB_PASSWORD | base64)'/g" secret.yaml
-								sed -i "s/<KEYCLOAK_DB_HOST>/'$(echo $KEYCLOAK_DB_HOST | base64)'/g" secret.yaml
-
-								echo "============================KEYCLOAK_CERT================================="
-								cat $WORKSPACE/cert.pem | base64
-
-								sed -i "s/<KEYCLOAK_CERT>/'$(cat $WORKSPACE/cert.pem | base64)'/g" secret.yaml
-
-								echo "============================KEYCLOAK_CERT_PRIVATE_KEY================================="
-								cat $WORKSPACE/key.pem | base64
-
-								sed -i "s/<KEYCLOAK_CERT_PRIVATE_KEY>/'$(cat $WORKSPACE/key.pem | base64)'/g" secret.yaml
+								sed -i "s/<KEYCLOAK_ADMIN_USERNAME>/$KEYCLOAK_ADMIN_USERNAME_B64/g" secret.yaml
+								sed -i "s/<KEYCLOAK_ADMIN_PASSWORD>/$KEYCLOAK_ADMIN_PASSWORD_B64/g" secret.yaml
+								sed -i "s/<KEYCLOAK_DB_USERNAME>/$KEYCLOAK_DB_USERNAME_B64/g" secret.yaml
+								sed -i "s/<KEYCLOAK_DB_PASSWORD>/$KEYCLOAK_DB_PASSWORD_B64/g" secret.yaml
+								sed -i "s/<KEYCLOAK_DB_HOST>/$KEYCLOAK_DB_HOST_B64/g" secret.yaml
+								sed -i "s/<KEYCLOAK_CERT>/$KEYCLOAK_CERT_B64/g" secret.yaml
+								sed -i "s/<KEYCLOAK_CERT_PRIVATE_KEY>/$KEYCLOAK_CERT_PRIVATE_KEY_B64/g" secret.yaml
 
 								cat secret.yaml
 							'''
