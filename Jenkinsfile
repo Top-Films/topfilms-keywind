@@ -120,7 +120,31 @@ spec:
 			}
 		}
 
-		stage('Prepare Keycloak Build') {
+		stage('Build Keycloak') {
+			when {
+				expression { 
+					DEPLOY_KEYCLOAK == "true"
+				}
+			}
+			steps {
+				script {
+					dir("${WORKSPACE}/k8s") {
+						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+							sh '''
+								cd $KEYCLOAK_NAME
+
+								echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
+
+								helm package helm --app-version=$KEYCLOAK_VERSION_HELM --version=$KEYCLOAK_VERSION_HELM
+								helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION_HELM.tgz $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME
+							'''
+						}
+					}
+				}
+			}
+		}
+
+		stage('Prepare Keycloak Deployment') {
 			when {
 				expression { 
 					DEPLOY_KEYCLOAK == "true"
@@ -158,30 +182,6 @@ spec:
 
 								kubectl apply -f secret.yaml -n $KEYCLOAK_NAME
 							"""
-						}
-					}
-				}
-			}
-		}
-
-		stage('Build Keycloak') {
-			when {
-				expression { 
-					DEPLOY_KEYCLOAK == "true"
-				}
-			}
-			steps {
-				script {
-					dir("${WORKSPACE}/k8s") {
-						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-							sh '''
-								cd $KEYCLOAK_NAME
-
-								echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
-
-								helm package helm --app-version=$KEYCLOAK_VERSION_HELM --version=$KEYCLOAK_VERSION_HELM
-								helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION_HELM.tgz $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME
-							'''
 						}
 					}
 				}
