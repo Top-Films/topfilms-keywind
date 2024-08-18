@@ -120,7 +120,7 @@ spec:
 			}
 		}
 
-		stage('Keycloak File Substitutions with Secrets') {
+		stage('Prepare Keycloak Build') {
 			when {
 				expression { 
 					DEPLOY_KEYCLOAK == "true"
