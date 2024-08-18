@@ -149,6 +149,8 @@ spec:
 								sed -i "s/<KEYCLOAK_DB_HOST>/$(echo $KEYCLOAK_DB_HOST | base64)/g" secret.yaml
 								sed -i "s/<KEYCLOAK_CERT>/$(echo $KEYCLOAK_CERT | base64)/g" secret.yaml
 								sed -i "s/<KEYCLOAK_CERT_PRIVATE_KEY>/$(echo $KEYCLOAK_CERT_PRIVATE_KEY | base64)/g" secret.yaml
+
+								cat secret.yaml
 							'''
 
 							sh """
