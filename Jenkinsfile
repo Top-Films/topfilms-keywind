@@ -138,43 +138,45 @@ spec:
 							file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')
 						]) {
 							sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
+							sh 'cp $KEYCLOAK_CERT cert.pem'
+							sh 'cp $KEYCLOAK_CERT_PRIVATE_KEY key.pem'
 
 							sh '''
 								cd $KEYCLOAK_NAME
 								
 								echo "============================KEYCLOAK_ADMIN_USERNAME================================="
-								sed -i "s/<KEYCLOAK_ADMIN_USERNAME>/$(echo $KEYCLOAK_ADMIN_USERNAME | base64)/g" secret.yaml
 								echo $KEYCLOAK_ADMIN_USERNAME | base64
+								sed -i "s/<KEYCLOAK_ADMIN_USERNAME>/$(echo $KEYCLOAK_ADMIN_USERNAME | base64)/g" secret.yaml
 								cat secret.yaml
 
 								echo "============================KEYCLOAK_ADMIN_PASSWORD================================="
-								sed -i "s/<KEYCLOAK_ADMIN_PASSWORD>/$(echo $KEYCLOAK_ADMIN_PASSWORD | base64)/g" secret.yaml
 								echo $KEYCLOAK_ADMIN_PASSWORD | base64
+								sed -i "s/<KEYCLOAK_ADMIN_PASSWORD>/$(echo $KEYCLOAK_ADMIN_PASSWORD | base64)/g" secret.yaml
 								cat secret.yaml
 
 								echo "============================KEYCLOAK_DB_USERNAME================================="
-								sed -i "s/<KEYCLOAK_DB_USERNAME>/$(echo $KEYCLOAK_DB_USERNAME | base64)/g" secret.yaml
 								echo $KEYCLOAK_DB_USERNAME | base64
+								sed -i "s/<KEYCLOAK_DB_USERNAME>/$(echo $KEYCLOAK_DB_USERNAME | base64)/g" secret.yaml
 								cat secret.yaml
 
 								echo "============================KEYCLOAK_DB_PASSWORD================================="
-								sed -i "s/<KEYCLOAK_DB_PASSWORD>/$(echo $KEYCLOAK_DB_PASSWORD | base64)/g" secret.yaml
 								echo $KEYCLOAK_DB_PASSWORD | base64
+								sed -i "s/<KEYCLOAK_DB_PASSWORD>/$(echo $KEYCLOAK_DB_PASSWORD | base64)/g" secret.yaml
 								cat secret.yaml
 
 								echo "============================KEYCLOAK_DB_HOST================================="
-								sed -i "s/<KEYCLOAK_DB_HOST>/$(echo $KEYCLOAK_DB_HOST | base64)/g" secret.yaml
 								echo $KEYCLOAK_DB_HOST | base64
+								sed -i "s/<KEYCLOAK_DB_HOST>/$(echo $KEYCLOAK_DB_HOST | base64)/g" secret.yaml
 								cat secret.yaml
 
 								echo "============================KEYCLOAK_CERT================================="
-								sed -i "s/<KEYCLOAK_CERT>/$(echo $KEYCLOAK_CERT | base64)/g" secret.yaml
-								echo $KEYCLOAK_CERT | base64
+								cat cert.pem | base64
+								sed -i "s/<KEYCLOAK_CERT>/$(cat cert.pem | base64)/g" secret.yaml
 								cat secret.yaml
 
 								echo "============================KEYCLOAK_CERT_PRIVATE_KEY================================="
-								sed -i "s/<KEYCLOAK_CERT_PRIVATE_KEY>/$(echo $KEYCLOAK_CERT_PRIVATE_KEY | base64)/g" secret.yaml
-								echo $KEYCLOAK_CERT_PRIVATE_KEY | base64
+								cat key.pem | base64
+								sed -i "s/<KEYCLOAK_CERT_PRIVATE_KEY>/$(cat key.pem | base64)/g" secret.yaml
 								cat secret.yaml
 							'''
 
