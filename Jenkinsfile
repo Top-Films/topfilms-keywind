@@ -49,11 +49,11 @@ spec:
 				script {
 					checkout scmGit(
 						branches: [[
-							name: "${params.KEYWIND_BRANCH}"
+							name: "$KEYWIND_BRANCH"
 						]],
 						userRemoteConfigs: [[
 							credentialsId: 'github',
-							url: "${env.KEYWIND_GITHUB_URL}"
+							url: "$KEYWIND_GITHUB_URL"
 						]]
 					)
 
@@ -66,7 +66,7 @@ spec:
 		stage('Node Build') {
 			steps {
 				script {
-					sh "npm version ${env.KEYWIND_VERSION_FULL} --no-git-tag-version"
+					sh "npm version $KEYWIND_VERSION_FULL --no-git-tag-version"
 
 					sh 'npm install'
 					sh 'npm run build'
@@ -106,11 +106,11 @@ spec:
 					dir("${WORKSPACE}/k8s") {
 						checkout scmGit(
 							branches: [[
-								name: "${params.K8S_BRANCH}"
+								name: "$K8S_BRANCH"
 							]],
 							userRemoteConfigs: [[
 								credentialsId: 'github',
-								url: "${env.K8S_GITHUB_URL}"
+								url: "$K8S_GITHUB_URL"
 							]]
 						)
 
@@ -180,7 +180,7 @@ spec:
 							sh """
 								cd $KEYCLOAK_NAME
 
-								kubectl apply --file secret.yaml --namespace $KEYCLOAK_NAME
+								kubectl apply --filename secret.yaml --namespace $KEYCLOAK_NAME
 							"""
 						}
 					}
