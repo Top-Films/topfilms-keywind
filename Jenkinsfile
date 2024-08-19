@@ -87,8 +87,8 @@ spec:
 						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 							sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
 
-							sh 'docker buildx build --platform linux/arm64/v8 . -t $DOCKER_USERNAME/$KEYWIND_NAME:$KEYWIND_VERSION_FULL -t $DOCKER_USERNAME/$KEYWIND_NAME:latest'
-							sh 'docker push $DOCKER_USERNAME/$KEYWIND_NAME -a'
+							sh 'docker buildx build --platform linux/arm64/v8 . --tag $DOCKER_USERNAME/$KEYWIND_NAME:$KEYWIND_VERSION_FULL --tag $DOCKER_USERNAME/$KEYWIND_NAME:latest'
+							sh 'docker push $DOCKER_USERNAME/$KEYWIND_NAME --all-tags'
 						}
 					}
 				}
@@ -180,7 +180,7 @@ spec:
 							sh """
 								cd $KEYCLOAK_NAME
 
-								kubectl apply -f secret.yaml -n $KEYCLOAK_NAME
+								kubectl apply --file secret.yaml --namespace $KEYCLOAK_NAME
 							"""
 						}
 					}
@@ -208,8 +208,12 @@ spec:
 							cp $CA_CERT ./cert.pem
 							cp $CA_CERT_PRIVATE_KEY ./key.pem
 
-							kubectl delete secret auth.topfilms.io-tls -n keycloak || true
-							kubectl create secret tls auth.topfilms.io-tls --cert=cert.pem --key=key.pem -n keycloak
+							set +e
+
+							kubectl delete secret auth.topfilms.io-tls --namespace keycloak
+							kubectl create secret tls auth.topfilms.io-tls --cert=cert.pem --key=key.pem --namespace keycloak
+
+							set -e
 						'''
 
 						sh '''
