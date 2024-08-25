@@ -205,8 +205,10 @@ spec:
 						sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
 
 						sh '''
-							cp $CA_CERT ./cert.pem
-							cp $CA_CERT_PRIVATE_KEY ./key.pem
+							cp $CA_CERT $WORKSPACE/cert.pem
+							cp $CA_CERT_PRIVATE_KEY $WORKSPACE/key.pem
+
+							ls -lah
 
 							set +e
 
