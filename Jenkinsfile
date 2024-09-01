@@ -24,6 +24,7 @@ spec:
 		string(name: 'KEYWIND_BRANCH', defaultValue: params.KEYWIND_BRANCH ?: 'main', description: 'Branch to checkout in keywind repo', trim: true)
 		string(name: 'KEYWIND_VERSION', defaultValue: params.KEYWIND_VERSION ?: '1.0', description: 'Major and minor version of the application', trim: true)
 		booleanParam(name: 'DEPLOY_KEYCLOAK', defaultValue: true, description: 'Deploy Keycloak with new Keywind theme')
+		booleanParam(name: 'DEPLOY_CA_CERT', defaultValue: false, description: 'Deploy ca cert as secret to k8s')
 		string(name: 'K8S_BRANCH', defaultValue: params.K8S_BRANCH ?: 'main', description: 'Branch to checkout in k8s repo', trim: true)
 		string(name: 'KEYCLOAK_VERSION', defaultValue: '23.0.7', description: 'Full version of keycloak', trim: true)
 	}
@@ -188,16 +189,15 @@ spec:
 			}
 		}
 
-		stage('Deploy Keycloak') {
+		stage('Deploy CA Cert') {
 			when {
 				expression { 
-					DEPLOY_KEYCLOAK == "true"
+					DEPLOY_CA_CERT == "true"
 				}
 			}
 			steps {
 				script {
 					withCredentials([
-						usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'), 
 						file(credentialsId: 'ca-cert', variable: 'CA_CERT'),
 						file(credentialsId: 'ca-cert-private-key', variable: 'CA_CERT_PRIVATE_KEY'),
 						file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')
@@ -217,6 +217,24 @@ spec:
 
 							set -e
 						'''
+					}
+				}
+			}
+		}
+
+		stage('Deploy Keycloak') {
+			when {
+				expression { 
+					DEPLOY_KEYCLOAK == "true"
+				}
+			}
+			steps {
+				script {
+					withCredentials([
+						usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'), 
+						file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')
+					]) {
+						sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
 
 						sh '''
 							echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
