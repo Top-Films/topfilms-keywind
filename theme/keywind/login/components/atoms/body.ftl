@@ -1,7 +1,7 @@
 <#macro kw>
 	<style>
 		.link {
-			color: #4c5563;
+			color: #000;
 			font-size: 14px;
 		}
 
