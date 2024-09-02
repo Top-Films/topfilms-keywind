@@ -14,8 +14,12 @@
 		.body-margin {
 			margin-top: 2rem;
 		}
+
+		.background-color {
+			background-color: #309cf2;
+		}
 	</style>
-	<body class="bg-secondary-100 flex flex-col items-center body-margin">
+	<body class="flex flex-col items-center body-margin background-color">
     	<#nested>
 		<div class="gap-4 grid grid-cols-3 mt-2">
 			<a href="https://topfilms.io/contact" class="link">Contact</a>
