@@ -8,7 +8,7 @@ export default {
     extend: {
       colors: {
         primary: colors.blue,
-        secondary: '#000',
+        secondary: colors.gray,
 
         provider: {
           apple: '#000000',
