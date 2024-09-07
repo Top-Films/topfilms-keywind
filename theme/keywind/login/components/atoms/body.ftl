@@ -19,11 +19,7 @@
 		}
 
 		a {
-			color: #c9c9c9 !important;
-		}
-
-		form > div > a {
-			color: #06c !important;
+			color: #309cf2 !important;
 		}
 	</style>
 	<body class="flex flex-col items-center body-margin background-color">
