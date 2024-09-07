@@ -18,6 +18,10 @@
 		.background-color {
 			background-color: #242424;
 		}
+
+		a {
+			color: #fff !important;
+		}
 	</style>
 	<body class="flex flex-col items-center body-margin background-color">
     	<#nested>
