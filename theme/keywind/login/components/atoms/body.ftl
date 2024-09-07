@@ -1,7 +1,6 @@
 <#macro kw>
 	<style>
 		.link {
-			color: #fff;
 			font-size: 14px;
 		}
 
@@ -20,7 +19,7 @@
 		}
 
 		a {
-			color: #fff !important;
+			color: #c9c9c9 !important;
 		}
 	</style>
 	<body class="flex flex-col items-center body-margin background-color">
