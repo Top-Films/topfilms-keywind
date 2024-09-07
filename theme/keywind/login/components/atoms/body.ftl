@@ -16,7 +16,7 @@
 		}
 
 		.background-color {
-			background-color: #309cf2;
+			background-color: #242424;
 		}
 	</style>
 	<body class="flex flex-col items-center body-margin background-color">
