@@ -24,7 +24,7 @@
 		}
 
 		.max-w-md {
-			max-width: 26rem !important;
+			max-width: 24rem !important;
 		}
 	</style>
 	<body class="flex flex-col items-center body-margin background-color">
