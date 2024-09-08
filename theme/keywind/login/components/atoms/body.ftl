@@ -26,11 +26,6 @@
 		.max-w-md {
 			max-width: 24rem !important;
 		}
-
-		.main-container {
-			margin-right: 1em;
-			margin-left: 1em
-		}
 	</style>
 	<body class="flex flex-col items-center body-margin background-color">
     	<#nested>
