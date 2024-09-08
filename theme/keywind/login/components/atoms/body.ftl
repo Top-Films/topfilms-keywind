@@ -22,6 +22,10 @@
 			text-decoration: underline;
 			cursor: pointer;
 		}
+
+		.max-w-md {
+			max-width: 26rem !important;
+		}
 	</style>
 	<body class="flex flex-col items-center body-margin background-color">
     	<#nested>
