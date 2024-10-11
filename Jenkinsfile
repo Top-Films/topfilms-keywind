@@ -26,7 +26,7 @@ spec:
 		booleanParam(name: 'DEPLOY_KEYCLOAK', defaultValue: true, description: 'Deploy Keycloak with new Keywind theme')
 		booleanParam(name: 'DEPLOY_CA_CERT', defaultValue: false, description: 'Deploy ca cert as secret to k8s')
 		string(name: 'K8S_BRANCH', defaultValue: params.K8S_BRANCH ?: 'main', description: 'Branch to checkout in k8s repo', trim: true)
-		string(name: 'KEYCLOAK_VERSION', defaultValue: '24.0.4', description: 'Full version of keycloak', trim: true)
+		string(name: 'KEYCLOAK_VERSION', defaultValue: '25.0.3', description: 'Full version of keycloak', trim: true)
 	}
 
 	environment { 
