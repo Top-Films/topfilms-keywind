@@ -6,7 +6,10 @@
   </div>
   <div class="gap-4 grid grid-cols-3">
     <#list providers as provider>
-	  ${provider}
+	  <script>
+		const values = Object.values(`${provider}`);
+		console.log("Values: ", values);
+      </script>
       <#switch provider.alias>
         <#case "apple">
           <#assign colorClass="hover:bg-provider-apple/10">
