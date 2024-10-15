@@ -1,10 +1,6 @@
 <#import "/assets/providers/providers.ftl" as providerIcons>
 
 <#macro kw providers=[]>
-  <script>
-	const values = Object.values(`${provider}`);
-	console.log(values)
-  </script>
   <div class="pt-4 separate text-secondary-600 text-sm">
 	${msg("identity-provider-login-label")}
   </div>

@@ -64,7 +64,7 @@
       </div>
     </#if>
   <#elseif section="socialProviders">
-    <#if realm.password && social.providers??>
+    <#if realm.password && social.providers?? && social.providers?size != 0>
       <@identityProvider.kw providers=social.providers />
     </#if>
   </#if>
