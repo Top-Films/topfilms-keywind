@@ -66,6 +66,34 @@
   </#assign>
 
   <html<#if realm.internationalizationEnabled> lang="${locale.currentLanguageTag}"</#if>>
+  	<style>
+		.body-margin {
+			margin-top: 2rem;
+		}
+
+		.background-color {
+			background-color: #242424;
+		}
+
+		a {
+			color: #309cf2 !important;
+		}
+
+		.link {
+			color: #c9c9c9 !important;
+			font-size: 14px;
+		}
+
+		.link:hover {
+			opacity: 0.7;
+			text-decoration: underline;
+			cursor: pointer;
+		}
+
+		.max-w-md {
+			max-width: 24rem !important;
+		}
+	</style>
     <head>
       <@document.kw script=script />
 	  	<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/Top-Films/assets/main/favicon/apple-touch-icon.png">
