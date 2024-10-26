@@ -51,6 +51,9 @@ rm key.pem
 
 kubectl apply --filename secret.yaml --namespace keycloak
 
-helm upgrade keycloak oci://registry-1.docker.io/$DOCKER_USERNAME/keycloak --version 1.0.0 --install --atomic --debug --history-max=3 --namespace keycloak --set image.tag=1.0.0 --timeout 10m0s
+helm upgrade keycloak keycloak-1.0.0.tgz --version 1.0.0 --install --atomic --debug --history-max=3 --namespace keycloak --set image.tag=26.0.2 --timeout 10m0s
+
+rm keycloak-1.0.0.tgz
 
 git restore secret.yaml
+git restore deploy.sh
