@@ -1,0 +1,109 @@
+image:
+  repository: quay.io/keycloak/keycloak
+  tag: '26.0.0'
+  pullPolicy: Always
+  replicas: 1
+  revisionHistoryLimit: 2
+  volumeMounts:
+    - mountPath: /var/keycloak
+      name: keycloak-cert
+      readOnly: true
+    - mountPath: /opt/keycloak/themes/topfilms-keywind
+      name: theme
+  env:
+    - name: KC_PROXY
+      value: edge
+    - name: KEYCLOAK_ADMIN
+      valueFrom:
+        secretKeyRef:
+          name: keycloak-credentials
+          key: admin-username
+    - name: KEYCLOAK_ADMIN_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: keycloak-credentials
+          key: admin-password
+    - name: DB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: keycloak-credentials
+          key: db-username
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: keycloak-credentials
+          key: db-password
+    - name: DB_HOST
+      valueFrom:
+        secretKeyRef:
+          name: keycloak-credentials
+          key: db-host
+  args:
+    - "start"
+    - "--db=postgres"
+    - "--db-username=$(DB_USERNAME)"
+    - "--db-password=$(DB_PASSWORD)"
+    - "--db-url=$(DB_HOST)"
+    - "--https-certificate-file=/var/keycloak/cert.pem"
+    - "--https-certificate-key-file=/var/keycloak/key.pem"
+    - "--hostname=auth.topfilms.io"
+    - "--spi-theme-static-max-age=-1"
+    - "--spi-theme-cache-themes=false"
+    - "--spi-theme-cache-templates=false"
+  readinessProbe:
+    scheme: HTTPS
+    path: /realms/master
+    port: 8443
+
+initContainers: 
+  - name: topfilms-keywind
+    image: maxmorhardt/topfilms-keywind:latest
+    imagePullPolicy: Always
+    command:
+      - /bin/sh
+      - -c
+    args:
+      - cp -r /topfilms-keywind/* /opt/keycloak/themes/topfilms-keywind
+    volumeMounts:
+      - mountPath: /opt/keycloak/themes/topfilms-keywind
+        name: theme
+
+volumes:
+  - name: keycloak-cert
+    secret:
+      secretName: keycloak-credentials
+  - name: theme
+    emptyDir: {}
+
+nodeSelector:
+    kubernetes.io/hostname: max-worker-2
+    
+service:
+  type: ClusterIP
+  port: 8443
+  targetPort: 8443
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: auth.topfilms.io
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: 
+   - secretName: auth.topfilms.io-tls
+     hosts:
+       - auth.topfilms.io.io
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 768Mi
+  requests:
+    cpu: 500m
+    memory: 512Mi
