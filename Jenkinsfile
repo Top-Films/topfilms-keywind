@@ -21,24 +21,21 @@ spec:
 	}
 
 	parameters {
-		string(name: 'KEYWIND_TAG', defaultValue: params.KEYWIND_BRANCH ?: '1.0.0', description: 'Branch to checkout in keywind repo', trim: true)
-		string(name: 'KEYCLOAK_TAG', defaultValue: '1.0.0', description: 'Full version of keycloak', trim: true)
+		string(name: 'TAG', defaultValue: params.TAG ?: '1.0.0', description: 'Git tag', trim: true)
 		booleanParam(name: 'DEPLOY_KEYCLOAK', defaultValue: true, description: 'Deploy Keycloak with new Keywind theme')
 		booleanParam(name: 'DEPLOY_CA_CERT', defaultValue: false, description: 'Deploy ca cert as secret to k8s')
 	}
 
 	environment { 
 		KEYWIND_NAME = 'topfilms-keywind'
-		KEYWIND_VERSION_FULL = "${params.KEYWIND_VERSION}.${env.BUILD_NUMBER}"
-		KEYWIND_GITHUB_URL = 'https://github.com/Top-Films/topfilms-keywind'
+
+		KEYCLOAK_NAME = 'keycloak'
+		KEYCLAOK_VERSION = '26.0.2'
+
+		GITHUB_URL = 'https://github.com/Top-Films/topfilms-keywind'
 
 		DOCKER_REGISTRY = 'registry-1.docker.io'
 		DOCKER_REGISTRY_FULL = "oci://${env.DOCKER_REGISTRY}"
-
-		K8S_GITHUB_URL = 'https://github.com/Top-Films/k8s'
-		
-		KEYCLOAK_NAME = 'keycloak'
-		KEYCLOAK_VERSION_HELM = "${env.KEYCLOAK_VERSION}-${env.BUILD_NUMBER}"
 	}
 
 	stages {
@@ -48,11 +45,11 @@ spec:
 				script {
 					checkout scmGit(
 						branches: [[
-							name: "$KEYWIND_BRANCH"
+							name: "$TAG"
 						]],
 						userRemoteConfigs: [[
 							credentialsId: 'github',
-							url: "$KEYWIND_GITHUB_URL"
+							url: "$GITHUB_URL"
 						]]
 					)
 
@@ -65,7 +62,10 @@ spec:
 		stage('Node Build') {
 			steps {
 				script {
-					sh "npm version $KEYWIND_VERSION_FULL --no-git-tag-version"
+					TAG_VERSION = "$TAG".split("/")[1]
+					echo "Version: $TAG_VERSION"
+
+					sh "npm version $TAG_VERSION --no-git-tag-version"
 
 					sh 'npm install'
 					sh 'npm run build'
@@ -83,37 +83,14 @@ spec:
 			steps {
 				container('dind') {
 					script {
+						TAG_VERSION = "$TAG".split("/")[1]
+
 						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 							sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
 
-							sh 'docker buildx build --platform linux/arm64/v8 . --tag $DOCKER_USERNAME/$KEYWIND_NAME:$KEYWIND_VERSION_FULL --tag $DOCKER_USERNAME/$KEYWIND_NAME:latest'
+							sh "docker buildx build --platform linux/arm64/v8 . --tag $DOCKER_USERNAME/$KEYWIND_NAME:$TAG_VERSION --tag $DOCKER_USERNAME/$KEYWIND_NAME:latest"
 							sh 'docker push $DOCKER_USERNAME/$KEYWIND_NAME --all-tags'
 						}
-					}
-				}
-			}
-		}
-
-		stage('Git Clone K8s') {
-			when {
-				expression { 
-					DEPLOY_KEYCLOAK == "true"
-				}
-			}
-			steps {
-				script {
-					dir("${WORKSPACE}/k8s") {
-						checkout scmGit(
-							branches: [[
-								name: "$K8S_BRANCH"
-							]],
-							userRemoteConfigs: [[
-								credentialsId: 'github',
-								url: "$K8S_GITHUB_URL"
-							]]
-						)
-
-						sh 'ls -lah'
 					}
 				}
 			}
@@ -127,17 +104,17 @@ spec:
 			}
 			steps {
 				script {
-					dir("${WORKSPACE}/k8s") {
-						withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-							sh '''
-								cd $KEYCLOAK_NAME
+					TAG_VERSION = "$TAG".split("/")[1]
 
-								echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
+					withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+						sh """
+							cd $KEYCLOAK_NAME
 
-								helm package helm --app-version=$KEYCLOAK_VERSION_HELM --version=$KEYCLOAK_VERSION_HELM
-								helm push ./$KEYCLOAK_NAME-$KEYCLOAK_VERSION_HELM.tgz $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME
-							'''
-						}
+							echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
+
+							helm package helm --app-version=$TAG_VERSION --version=$TAG_VERSION
+							helm push ./$KEYCLOAK_NAME-$TAG_VERSION.tgz $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME
+						"""
 					}
 				}
 			}
@@ -230,13 +207,15 @@ spec:
 						usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD'), 
 						file(credentialsId: 'kube-config', variable: 'KUBE_CONFIG')
 					]) {
+						TAG_VERSION = "$TAG".split("/")[1]
+
 						sh 'mkdir -p $WORKSPACE/.kube && cp $KUBE_CONFIG $WORKSPACE/.kube/config'
 
-						sh '''
+						sh """
 							echo "$DOCKER_PASSWORD" | helm registry login $DOCKER_REGISTRY --username $DOCKER_USERNAME --password-stdin
 							
-							helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME/$KEYCLOAK_NAME --version $KEYCLOAK_VERSION_HELM --install --atomic --debug --history-max=3 --namespace keycloak --set image.tag=$KEYCLOAK_VERSION --timeout 10m0s
-						'''
+							helm upgrade $KEYCLOAK_NAME $DOCKER_REGISTRY_FULL/$DOCKER_USERNAME/$KEYCLOAK_NAME --version $TAG_VERSION --install --atomic --debug --history-max=3 --namespace keycloak --set image.tag=$KEYCLOAK_VERSION --timeout 10m0s
+						"""
 					}
 				}
 			}
