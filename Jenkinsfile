@@ -22,6 +22,7 @@ spec:
 
 	parameters {
 		string(name: 'TAG', defaultValue: params.TAG ?: '1.0.0', description: 'Git tag', trim: true)
+		string(name: 'KEYCLOAK_VERSION', defaultValue: params.KEYCLOAK_VERSION ?: '26.0.2', description: 'Git tag', trim: true)
 		booleanParam(name: 'DEPLOY_KEYCLOAK', defaultValue: true, description: 'Deploy Keycloak with new Keywind theme')
 		booleanParam(name: 'DEPLOY_CA_CERT', defaultValue: false, description: 'Deploy ca cert as secret to k8s')
 	}
